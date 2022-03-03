@@ -10,58 +10,58 @@ hands = mp_hands.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.5
 
 tipIds = [4, 8, 12, 16, 20]
 
-# Define a function to count fingers
+# Definir una función para contar dedos
 
 def countFingers(image, hand_landmarks, handNo=0):
     
     if hand_landmarks:
-        # Get all Landmarks of the FIRST Hand VISIBLE
+        # Obtener todos los puntos de referencia de la primera mano visible
         landmarks = hand_landmarks[handNo].landmark
         # print(landmarks)
 
-        # Count Fingers        
+        # Contar dedos
         fingers = []
 
         for lm_index in tipIds:
-                # Get Finger Tip and Bottom y Position Value
+                # Obtener puntas de los dedos y valor de posición "y" inferior
                 finger_tip_y = landmarks[lm_index].y 
                 finger_bottom_y = landmarks[lm_index - 2].y
                 
-                # Get Thumb Tip and Bottom y Position Value
+                # Obtener punta del pulgar y valor de posición "y" 
                 thumb_tip_x = landmarks[lm_index].x
                 thumb_bottom_x = landmarks[lm_index - 2].x
 
-                # Check if ANY FINGER is OPEN or CLOSED
+                # Verificar si algún dedo está abierto o cerrado
                 if lm_index !=4:
                     if finger_tip_y < finger_bottom_y:
                         fingers.append(1)
-                        print("FINGER with id ",lm_index," is Open")
+                        print("El dedo con id ",lm_index," está abierto.")
 
                     if finger_tip_y > finger_bottom_y:
                         fingers.append(0)
-                        print("FINGER with id ",lm_index," is Closed")
+                        print("El dedo con id ",lm_index," está cerrado.")
                 else:
                     if thumb_tip_x > thumb_bottom_x:
                         fingers.append(1)
-                        print("THUMB is Open")
+                        print("El pulgar está abierto.")
 
                     if thumb_tip_x < thumb_bottom_x:
                         fingers.append(0)
-                        print("THUMB is Closed")
+                        print("El pulgar está cerrado.")
 
 
         # print(fingers)
         totalFingers = fingers.count(1)
 
-        # Display Text
+        # Mostrar texto
         text = f'Fingers: {totalFingers}'
 
         cv2.putText(image, text, (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
 
-# Define a function to 
+# Definir una función para
 def drawHandLanmarks(image, hand_landmarks):
 
-    # Darw connections between landmark points
+    # Dibujar las conexiones entre los puntos de referencia
     if hand_landmarks:
 
       for landmarks in hand_landmarks:
@@ -74,21 +74,21 @@ while True:
 
     image = cv2.flip(image, 1)
     
-    # Detect the Hands Landmarks 
+    # Detectar los puntos de referencia de las manos
     results = hands.process(image)
 
-    # Get landmark position from the processed result
+    # Obtener la posición de los puntos de referencia del resultado procesado
     hand_landmarks = results.multi_hand_landmarks
 
-    # Draw Landmarks
+    # Dibujar puntos de referencia
     drawHandLanmarks(image, hand_landmarks)
 
-    # Get Hand Fingers Position        
+    # Obtener las posiciones de los dedos de la mano
     countFingers(image, hand_landmarks)
 
-    cv2.imshow("Media Controller", image)
+    cv2.imshow("Controlador de medios", image)
 
-    # Quit the window on pressing Sapcebar key
+    # Cerrar la ventana al precionar la barra espaciadora
     key = cv2.waitKey(1)
     if key == 32:
         break
